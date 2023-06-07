@@ -6,7 +6,7 @@ class Rocket():
         self.screen = screen
         self.screen_rect = screen.get_rect()
         self.settings = settings
-        self.image = pygame.image.load('images/rocket.jpg')
+        self.image = pygame.image.load('rocket_game/images/rocket.jpg')
         self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.center = self.screen_rect.center
