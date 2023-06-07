@@ -6,7 +6,7 @@ class Ship():
         self.screen = screen
         self.screen_rect = screen.get_rect()
         self.settings = settings
-        self.image = pygame.image.load('images/ship.bmp')
+        self.image = pygame.image.load('side_shooting/images/ship.bmp')
         self.image = pygame.transform.rotate(self.image, -90)
         self.rect = self.image.get_rect()
         self.rect.midleft = self.screen_rect.midleft
