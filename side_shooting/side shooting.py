@@ -4,6 +4,8 @@ from settings import Settings
 import sys
 from ship_side import Ship
 from side_alien import Alien
+from time import sleep
+from game_stats import GameStats
 
 
 class SideShooting():
@@ -15,6 +17,7 @@ class SideShooting():
             (self.settings.screen_width, self.settings.screen_height))
         self.screen_rect = self.screen.get_rect()
         pygame.display.set_caption("Side Shooting")
+        self.stats = GameStats(self)
         self.ship = Ship(self.screen, self.settings)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -23,9 +26,12 @@ class SideShooting():
     def run_game(self):
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_aliens()
+            if self.stats.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self.finish()
+                if self.stats.game_active:
+                    self._update_aliens()
             self._update_screen()
 
     def _check_events(self):
@@ -68,13 +74,37 @@ class SideShooting():
     def _check_bullet_alien_collisions(self):
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, True)
+        for bullet, aliens in collisions.items():
+            self.stats.hit_aliens += len(aliens)
         if not self.aliens:
             self.bullets.empty()
-            self._create_fleet()
 
     def _update_aliens(self):
-        # self._check_fleet_edges()
+        if not self.aliens:
+            self._create_fleet()
         self.aliens.update()
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._ship_hit()
+        self._check_aliens_bottom()
+
+    def _ship_hit(self):
+        self.stats.ships_left -= 1
+        self.stats.hit_ships += 1
+        self.aliens.empty()
+        self.bullets.empty()
+        self._create_fleet()
+        sleep(0.5)
+
+    def finish(self):
+        if self.stats.hit_aliens >= self.stats.spawned_alien_count:
+            self.stats.game_active = False
+
+    def _check_aliens_bottom(self):
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.left <= screen_rect.left:
+                self._ship_hit()
+                break
 
     def _create_fleet(self):
         alien = Alien(self)
@@ -87,7 +117,7 @@ class SideShooting():
         number_aliens_x = available_space_x // (2 * alien_width)
 
         number_rows = available_space_y // (2 * alien_height)
-
+        self.stats.spawned_alien_count = number_rows * number_aliens_x
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
                 self._create_alien(alien_number, row_number)
