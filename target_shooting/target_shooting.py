@@ -90,6 +90,7 @@ class TargetShooting():
             if bullet.rect.right >= self.settings.screen_width:
                 self.bullets.remove(bullet)
                 self.stats.miss_number -= 1
+                self.settings.increase_speed()
         self._collision_bullet_target()
 
     def _finish(self):
@@ -98,6 +99,7 @@ class TargetShooting():
             self.bullets.empty()
             self.stats.reset_stats()
             pygame.mouse.set_visible(True)
+            self.settings.initialize_dynamic_settings()
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)

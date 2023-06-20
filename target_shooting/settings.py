@@ -14,3 +14,11 @@ class Settings():
         self.bullet_color = (60, 60, 60)
         self.bullets_allowed = 3
         self.miss_number = 3
+        self.speedup_scale = 1.6
+        self.initialize_dynamic_settings()
+
+    def initialize_dynamic_settings(self):
+        self.target_speed = 0.1
+
+    def increase_speed(self):
+        self.target_speed *= self.speedup_scale
